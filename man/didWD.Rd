@@ -7,11 +7,11 @@
 didWD(dt, id, year, y, w)
 }
 \arguments{
-\item{dt}{A data.frame including id, year, y and w.}
+\item{dt}{A data.frame including \code{id}, \code{year}, \code{y} and \code{w}.}
 
 \item{id}{A coloumn name denotes individuals.}
 
-\item{year}{A coloumn name denotes times.}
+\item{year}{A coloumn name denotes times. \code{dt$year} is numeric.}
 
 \item{y}{A coloumn name denotes the dependent variable.}
 
@@ -19,7 +19,8 @@ didWD(dt, id, year, y, w)
 and \eqn{T-i=1} indicates in the treated periods.}
 }
 \value{
-Results of Two ways fixed effect
+A list including 2 elements, one is results of regression with Two ways fixed effect,
+another is data frame added \eqn{d_q} and \eqn{f_t}.
 }
 \description{
 Make a DID regression conditional on staggered treatment based on Wooldridge (2021).
@@ -28,6 +29,6 @@ Make a DID regression conditional on staggered treatment based on Wooldridge (20
 library(plm)
 data(stg6, package = 'didWD')
 fit <- didWD(stg6, id = 'id', year = 'year', y = 'logy', w = 'w')
-lmtest::coeftest(fit, vcov. = vcovHC, method = 'white2')
+lmtest::coeftest(fit$fit, vcov. = vcovHC, method = 'white2')
 
 }
