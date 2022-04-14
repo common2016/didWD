@@ -1,0 +1,154 @@
+---
+title: "Wooldridge异质性DID方法"
+author: "陈普"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+## 1. 计量理论
+### 1.1 无协变量时模型设置
+交叠干预DID或者说异质性DID得到广泛关注。Wooldridge (2021)[^1]认为异质性DID仍然可以在双因素回归的框架中实现，但你的模型要饱和。该论文长达70页，但思路非常清晰。这里仅就其中心思想做一个简单概括。
+
+令$y_{it}$是因变量，$i,t$分别是个体和时间脚标，$w_{it}$是一个示性变量，如果个体$i$在时间$t$被处理了则为1。本质上,$w_{it}=D_i\cdot T_i$，其中$D_i$为1表示个体是处理组，$T_i$为1表示个体在该期被处理。那么，一个如下的混合回归为，
+$$
+y_{it}=\beta_0+\sum_{r=q}^T\lambda_r\cdot d_{ir}+\sum_{s=2}^T\theta_s\cdot fs_t+\tau\cdot w_{it}+u_{it}
+$$
+其中$d_{ir}$是虚拟变量，如果个体$i$在$r$期开始了它的第一次处理则为1，并且在之后的时期它均为1。$fs_t$是时间虚拟变量,如果$s=t$则取值为1。比如$f2014_t$这个变量仅在2014年取1，其他年份取0。求和脚标中的$q$ 表示样本中的个体第一次被干预的时间。$d_{ir}$代表了个体固定效应（这一点稍后说明）,$fs_t$代表了时间固定效应。因此双因素回归时只要去掉这两类自变量，得到的结果和上述混合回归结果是一样的。
+
+这种回归得到的系数$\tau$由于负权重问题，它不代表ATT（被处理者的平均处理效应），这在多篇论文中都有阐述，包括Callaway and Sant Anna(2021)[^2]等。Wooldridge (2021)指出，你应该做如下的混合回归，
+$$
+y_{it}=\beta_0+\sum_{r=q}^T\lambda_r\cdot d_{ir}+\sum_{s=2}^T\theta_s\cdot fs_t+\sum_{r=q}^T\sum_{s=r}^T\tau_{rs}\cdot (w_{it}\cdot d_{ir}\cdot fs_t)+u_{it}
+$$
+此时的$\tau_{rs}$就代表了第一次在$r$期被干预的个体在$s$期的ATT。类似地，双因素回归只需要包含$w_{it}\cdot d_{ir}\cdot fs_t$作自变量。
+
+Wooldridge(2021)拓展了Mundlak的结论，指出，对一个自变量$x_{it}$进行双因素固定效应回归得到系数，与对$x_{it},x_{i.},x_{.t}$进行混合回归的得到的$x_{it}$的系数是相同的，这里$x_{i.}$是$x_{it}$按个体分组得到的时间平均，$x_{.t}$是按时间分组得到的个体均值。注意到$w_{it}\cdot d_{ir}\cdot fs_t=d_{ir}\cdot fs_t$，而$d_{ir}\cdot fs_t$的时间平均为$d_i/T$，个体平均为$\bar{d}\cdot fs_t$，其中$\bar{d}$是处理组个体在样本中的比例。可以看到，它们为$d_{ir}$和$fs_t$的一个比例倍数。因此，对上式的混合回归等价于仅对$d_{ir}\cdot fs_t$做双因素固定效应回归。
+
+### 1.2 有协变量时模型设置
+当包含协变量时，自变量会增加，主要的目的在于饱和模型。具体而言，模型设置如下，
+$$
+\begin{aligned}
+	y_{it}=&\eta+\sum_{r=q}^T\lambda_rd_{ir}+\mathbf{x_i\kappa}+\sum_{r=q}^T(d_{ir}\cdot\mathbf{x}_i)\zeta_r+\sum_{s=2}^T\theta_sfs_t+\sum_{s=2}^T(fs_t\cdot\mathbf{x}_i)\pi_s+\\
+	&\sum_{r=q}^T\sum_{s=r}^T\tau_{rs}(w_{it}\cdot d_{ir}\cdot fs_t)+\sum_{r=q}^T\sum_{s=r}^T(w_{it}\cdot d_{ir}\cdot fs_t\cdot \dot{\mathbf{x}}_{ir})\rho_{rs}+u_{it}
+\end{aligned}\tag{*}\label{eq1}
+$$
+注意自变量的编排。先是$d_{ir}$和$\mathbf{x}_i$，然后是它们的交互，再加入$fs_t$，再和$\mathbf{x}_i$交互，然后加入我们感兴趣的$w_{it}\cdot d_{ir}\cdot fs_t$(或者说$d_{ir}\cdot fs_t$)，最后再加入与$\mathbf{x}_i$的交互。注意最后这个交互用的是$\dot{x}_{ir}=x_i-N_i^{-1}\sum_{h=1}^Nd_{hr}\mathbf{x}_h$，是一个基于干预时机的组内去均值，这么做的原因主要是方便$\tau_{rs}$的经济含义的解释。否则，$\tau_{rs}$解释为在$\mathbf{x}_i$取0时的ATT，通过这样的去均值处理，$\tau_{rs}$可以解释为$\mathbf{x}_i$在以干预分组的均值处时的ATT。
+
+### 1.3 共同趋势检验
+
+无协变量时检验方程可以写为，
+$$
+y_{it}=\eta+\sum_{r=q}^T\lambda_r\cdot d_{ir}+\sum_{s=2}^T\theta_s\cdot fs_t+\sum_{r=q}^T\sum_{s=2}^{r-1}\omega_{rs}(d_{ir}\cdot fs_t)+\sum_{r=q}^T\sum_{s=r}^T\delta_{rs}(d_{ir}\cdot fs_t)+u_{it} 
+$$
+
+检验的原假设为，
+$$H_0:\omega_{rs}=0,r=q,\cdots,T, s=2,\cdots,r-1$$
+有协变量时检验方程可在$\eqref{eq1}$式的基础上再增加如下自变量，
+$$
+	f2_t,\cdots,f(q-1)_t,f2_t\cdot\mathbf{x}_i,\cdots,f(q-1)_t\cdot\mathbf{x}_i, \\
+	d_{iq}f2_t,\cdots,d_{iq}f(q-1)_t,d_{i,q+1}f2_t,\cdots,d_{i,q+1}fq_t,d_{iT}f2_t,\cdots,d_{iT}f(T-1)_t
+$$
+同时检验上述第二行变量的联合显著性。
+
+## 2. 一个案例
+### 2.1 ATT估计
+Wooldridge (2021)提供了一个Stata代码，我这里做一个简单的阐述。先载入示例数据（Wooldridge把它存在Dropbox上，国内好像下载不了。我把它转存在[这里](https://common2016.github.io/chenpu.github.io/files/staggered_6.dta)。[这里](https://common2016.github.io/chenpu.github.io/files/staggered_6.do)是他的对应do文件），
+```{r}
+rm(list = ls())
+library(pacman)
+p_load(readstata13, tidyverse, plm)
+# 这是我的本地存储，你可以下载数据后更换成你的存储位置
+stg6 <- read.dta13('/Users/yangnay/elements/RawE/15_MySummary/异质性DID/Code/staggered_6.dta')
+stg6[1:7,]
+```
+
+数据包含`r length(unique(stg6$id))`个个体，年份从2011年至2016年，交叠干预的时期始于2014年。为此，首先生成$fs_{t}$变量，
+```{r}
+stg6$f2014 <- as.integer(stg6$year == 2014)
+stg6$f2015 <- as.integer(stg6$year == 2015)
+stg6$f2016 <- as.integer(stg6$year == 2016)
+```
+再生成$d_{ir}$变量，其中，因为$q=4$，即样本中的个体第一次被干预的时期是第四年，所以$r=4,5,6$。
+```{r}
+stg6 <- group_by(stg6, id) %>% summarise(wsum = sum(w)) %>% left_join(stg6,., by = 'id')
+stg6$d4 <- as.integer(stg6$wsum == 3)
+stg6$d5 <- as.integer(stg6$wsum == 2)
+stg6$d6 <- as.integer(stg6$wsum == 1)
+```
+
+那么，双因素回归如下，
+```{r}
+ans <- plm(logy ~ d4:f2014 + d4:f2015 + d4:f2016 + d5:f2015 + d5:f2016 +
+      d6:f2016, index = c('id','year'), effect = 'twoways',model = 'within', data = stg6)
+summary(ans)
+```
+
+注意，`d4`有3个交互，`d5`有2个交互，`d6`有一个交互。另外，因为$w_{it}\cdot d_{ir}\cdot fs_t=d_{ir}\cdot fs_t$，所以我们仅需提供$d_{ir}$和$fs_{t}$ 2个变量的交互。最后，这些交互项的系数与Callaway and Sant Anna(2021)提供的`did::agg_gt`函数返回结果中的`ATT(g,t)`列的含义是类似的。
+
+此外，在固定效应回归中，我们通常更喜欢使用在个体层面聚类标准误，可以添加代码如下，
+```{r}
+library(lmtest)
+coeftest(ans, vcov. = vcovHC, method = 'white2')
+```
+
+
+那么，在具有协变量时，首先生成按干预时机分组的组内去均值的协变量，
+```{r}
+stg6$x1_dm4 <- stg6$x1 - mean(stg6$x1[stg6$d4==1])
+stg6$x1_dm5 <- stg6$x1 - mean(stg6$x1[stg6$d5==1])
+stg6$x1_dm6 <- stg6$x1 - mean(stg6$x1[stg6$d6==1])
+```
+
+然后，回归如下，
+```{r}
+ans <- plm(logy ~ d4:f2014 + d4:f2015 + d4:f2016 + d5:f2015 + d5:f2016 +
+      d6:f2016 + d4:f2014:x1_dm4 + d4:f2015:x1_dm4 + d4:f2016:x1_dm4 + d5:f2015:x1_dm5 +
+      d5:f2016:x1_dm5 + d6:f2016:x1_dm6 + f2014:x1 + f2015:x1 + f2016:x1, index = c('id','year'), effect = 'twoways',
+    model = 'within', data = stg6)
+summary(ans)
+```
+
+类似地，对于个体层面聚类标准误，可以添加代码如下，
+```{r}
+coeftest(ans, vcov. = vcovHC, method = 'white2')
+```
+
+### 2.2 共同趋势检验
+
+先生成处理前的时间哑变量，
+```{r}
+stg6$f2012 <- as.integer(stg6$year == 2012)
+stg6$f2013 <- as.integer(stg6$year == 2013)
+```
+然后，无协变量时如下回归并进行F检验，
+```{r}
+ans <- plm(logy ~ d4:f2012 + d4:f2013 + d5:f2012 + d5:f2013 + d5:f2014 + d6:f2012 +
+      d6:f2013 + d6:f2014 + d6:f2015 +
+      d4:f2014 + d4:f2015 + d4:f2016 + d5:f2015 + d5:f2016 +
+      d6:f2016, index = c('id','year'), effect = 'twoways',model = 'within', data = stg6)
+library(car)
+CTH0 <- c('d4:f2012', 'd4:f2013', 'f2012:d5', 'f2013:d5', 'd5:f2014', 'f2012:d6', 'f2013:d6', 'f2014:d6', 'd6:f2015')
+linearHypothesis(ans, CTH0, vcov. = vcovHC)
+```
+
+在有协变量模型稍微复杂些，
+```{r}
+ans <- plm(logy ~ f2012:x1 + f2013:x1 + d4:f2012 + d4:f2013 + d5:f2012 +
+      d5:f2013 + d5:f2014 + d6:f2012 + d6:f2013 + d6:f2014 + d6:f2015 +
+      d4:f2014 + d4:f2015 + d4:f2016 + d5:f2015 + d5:f2016 +
+      d6:f2016 + d4:f2014:x1_dm4 + d4:f2015:x1_dm4 + d4:f2016:x1_dm4 + d5:f2015:x1_dm5 +
+      d5:f2016:x1_dm5 + d6:f2016:x1_dm6 + f2014:x1 + f2015:x1 + f2016:x1, index = c('id','year'), effect = 'twoways',
+    model = 'within', data = stg6)
+CTH0 <- c('f2012:d4', 'f2013:d4', 'f2012:d5', 'f2013:d5', 'd5:f2014', 'f2012:d6', 'f2013:d6', 'f2014:d6', 'd6:f2015')
+linearHypothesis(ans, CTH0, vcov. = vcovHC)
+```
+
+## 3. 其他
+
+一旦获得$\tau_{rs}$，你同样可进行各种加总处理，而且因为这种加总往往是线性组合，其标准误的获得也是非常简单。
+
+[^1]: J. M. Wooldridge, “Two-Way Fixed Effects, the Two-Way Mundlak Regression, and Difference-in-Differences Estimators.” SSRN, 2021.
+
+[^2]: B. Callaway and P. H. C. Sant Anna, “Difference-in-Differences with multiple time periods,” Journal of Econometrics, vol. 225, no. 2, pp. 200–230, 2021, doi: 10.1016/j.jeconom.2020.12.001.
