@@ -10,5 +10,14 @@ regdata$w[regdata$operationalstock > 100] <- 1
 
 cn <- regdata[regdata$iso2c %in% c('CN') & regdata$year <= 2014,]
 
-fit <- didWD(cn, 'id', 'year', y = 'TFP', w = 'w')
+cn$wcont <- log(cn$operationalstock+1)
+fit <- didWD(cn, 'id', 'year', y = 'TFP', w = 'w', wcontinuous = 'wcont')
+summary(fit$fit)
+
+xname <- coef(fit$fit) %>% names()
+aggeff(fit$fit, xname)
+
+aggbeta <- xname[str_detect(xname,'d2008')]
+aggeff(fit$fit, aggbeta)
+
 ans <- fit$data

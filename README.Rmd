@@ -33,9 +33,12 @@ devtools::install_github("common2016/didWD")
 
 This is a basic example which shows you how to solve a common problem:
 
-```{r example, eval=FALSE}
+```{r example}
 library(didWD)
+library(plm)
 ## basic example code
+fit <- didWD(stg6, id = 'id', year = 'year', y = 'logy', w = 'w')
+lmtest::coeftest(fit$fit, vcov. = vcovHC, method = 'white2')
 ```
 
 

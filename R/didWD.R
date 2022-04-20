@@ -8,6 +8,7 @@
 #' @param y A coloumn name denotes the dependent variable.
 #' @param w A dummy variable which equals \eqn{D_i\cdot T_i} where \eqn{D_i=1} indicates treated group,
 #' and \eqn{T-i=1} indicates in the treated periods.
+#' @param wcontinous A character, the continuous treatment variable's name. Default is \code{NULL}.
 #'
 #' @import magrittr
 #'
@@ -24,7 +25,7 @@
 #' xname <- names(coef(fit$fit))
 #' aggeff(fit$fit, xname)
 #'
-didWD <- function(dt, id, year, y, w){
+didWD <- function(dt, id, year, y, w, wcontinuous = NULL){
   stgyr <- dt$year[dt$w!=0] %>% unique() %>% sort()
 
   # generate fq
@@ -44,7 +45,9 @@ didWD <- function(dt, id, year, y, w){
       }
     }
   }
+  if (!is.null(wcontinuous)) ans <- paste(wcontinuous, ':', ans, sep = '')
   fml <- eval(parse(text = paste(y, paste(ans, collapse = '+'), sep = '~')))
+  # browser()
 
   # TWFE
   fit <- plm::plm(fml, index = c(id, year), effect = 'twoways',model = 'within', data = dt)
