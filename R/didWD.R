@@ -8,7 +8,7 @@
 #' @param y A coloumn name denotes the dependent variable.
 #' @param w A dummy variable which equals \eqn{D_i\cdot T_i} where \eqn{D_i=1} indicates treated group,
 #' and \eqn{T-i=1} indicates in the treated periods.
-#' @param wcontinous A character, the continuous treatment variable's name. Default is \code{NULL}.
+#' @param wcontinuous A character, the continuous treatment variable's name. Default is \code{NULL}.
 #'
 #' @import magrittr
 #'

@@ -4,7 +4,7 @@
 \alias{didWD}
 \title{DID Regression}
 \usage{
-didWD(dt, id, year, y, w)
+didWD(dt, id, year, y, w, wcontinuous = NULL)
 }
 \arguments{
 \item{dt}{A data.frame including \code{id}, \code{year}, \code{y} and \code{w}.}
@@ -17,6 +17,8 @@ didWD(dt, id, year, y, w)
 
 \item{w}{A dummy variable which equals \eqn{D_i\cdot T_i} where \eqn{D_i=1} indicates treated group,
 and \eqn{T-i=1} indicates in the treated periods.}
+
+\item{wcontinuous}{A character, the continuous treatment variable's name. Default is \code{NULL}.}
 }
 \value{
 A list including 2 elements, one is results of regression with Two ways fixed effect,
