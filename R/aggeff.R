@@ -5,6 +5,7 @@
 #' @param se methods computing standard error. \code{'white2'} indicates s.e. clustered in
 #' individuals, \code{'white1'} indicate common White s.e., and \code{'arellano'} means
 #' the vcov matrix is block diagonal. See the help of \code{plm::vcovHC}.
+#' @export
 #'
 #' @return a numeric vector including mean, standard error and t value.
 #'

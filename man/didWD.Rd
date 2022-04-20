@@ -30,5 +30,8 @@ library(plm)
 data(stg6, package = 'didWD')
 fit <- didWD(stg6, id = 'id', year = 'year', y = 'logy', w = 'w')
 lmtest::coeftest(fit$fit, vcov. = vcovHC, method = 'white2')
+# aggregate treat effect
+xname <- names(coef(fit$fit))
+aggeff(fit$fit, xname)
 
 }
