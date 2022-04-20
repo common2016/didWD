@@ -15,6 +15,9 @@ LazyData: true
 Imports: 
     dplyr,
     magrittr,
-    plm
+    stats,
+    plm,
+    rlang,
+    matlab
 Suggests: 
     lmtest

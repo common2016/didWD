@@ -9,13 +9,14 @@
 #'
 #' @return A data.frame includes \eqn{d_q} dummy variables.
 #' @export
+#' @importFrom rlang .data
 #'
 #' @examples
 #' data(stg6)
 #' gen_dq(stg6, id, w, stgyr = 2013:2016)
 #'
 gen_dq <- function(dt, id, w, stgyr){
-  dt <- dplyr::group_by(dt, id) %>% dplyr::summarise(wsum = sum(w)) %>% dplyr::left_join(dt,., by = 'id')
+  dt <- dplyr::group_by(dt, id) %>% dplyr::summarise(wsum = sum(w)) %>% dplyr::left_join(dt,.data, by = 'id')
   n <- max(stgyr) - min(stgyr) + 1
   ans <- lapply(n:1, function(i) as.integer(dt$wsum == i)) %>% dplyr::bind_cols() %>% suppressMessages()
   # rename
