@@ -25,7 +25,7 @@
 #' aggeff(fit$fit, xname)
 #'
 didWD <- function(dt, id, year, y, w){
-  stgyr <- dt$year[dt$w!=0] %>% unique()
+  stgyr <- dt$year[dt$w!=0] %>% unique() %>% sort()
 
   # generate fq
   dt <- gen_fst(dt, year, stgyr)
