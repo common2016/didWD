@@ -16,7 +16,7 @@ individuals, \code{'white1'} indicate common White s.e., and \code{'arellano'} m
 the vcov matrix is block diagonal. See the help of \code{plm::vcovHC}.}
 }
 \value{
-a numeric vector including mean, standard error and t value.
+a numeric vector including mean, standard error, t value and p value.
 }
 \description{
 Aggrgate Treatment Effects

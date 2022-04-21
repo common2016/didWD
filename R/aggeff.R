@@ -7,7 +7,7 @@
 #' the vcov matrix is block diagonal. See the help of \code{plm::vcovHC}.
 #' @export
 #'
-#' @return a numeric vector including mean, standard error and t value.
+#' @return a numeric vector including mean, standard error, t value and p value.
 #'
 aggeff <- function(fit, xname, se = 'white2'){
   # get mean
@@ -20,5 +20,7 @@ aggeff <- function(fit, xname, se = 'white2'){
   covmt <- covmt[ans,ans]
   a <- matlab::ones(nrow(covmt),1)/nrow(covmt)
   se <- sqrt((t(a) %*% covmt %*% a))
-  return(c(mu = mu, se = se, tvalue = mu/se))
+  tvalue <- mu/se
+  prob <- 2*(1 - pt(tvalue, fit$df.residual))
+  return(c(mu = mu, se = se, tvalue = tvalue, prob = prob))
 }
