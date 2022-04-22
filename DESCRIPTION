@@ -18,6 +18,8 @@ Imports:
     stats,
     plm,
     rlang,
-    matlab
+    matlab,
+    car,
+    stringr
 Suggests: 
     lmtest

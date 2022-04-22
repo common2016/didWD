@@ -21,6 +21,6 @@ aggeff <- function(fit, xname, se = 'white2'){
   a <- matlab::ones(nrow(covmt),1)/nrow(covmt)
   se <- sqrt((t(a) %*% covmt %*% a))
   tvalue <- mu/se
-  prob <- 2*(1 - pt(tvalue, fit$df.residual))
+  prob <- 2*(1 - stats::pt(abs(tvalue), fit$df.residual))
   return(c(mu = mu, se = se, tvalue = tvalue, prob = prob))
 }

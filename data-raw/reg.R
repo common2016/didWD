@@ -6,7 +6,8 @@ load_all()
 # usethis::use_data(stg6)
 
 stgyr <- 2014:2016
-dt <- gen_fst(stg6, 'year', stgyr) %>% gen_dq('id', 'w', stgyr)
+allyr <- 2011:2016
+dt <- cbind(stg6, gen_fst(stg6, 'year', allyr), gen_dq(stg6, 'id', 'w', stgyr))
 
 # ---------无协变量估计------------
 # 单因素回归
@@ -16,10 +17,22 @@ xtreg logy c.d2014#c.f2014 c.d2014#c.f2015 c.d2014#c.f2016 ///
 	c.d2016#c.f2016 ///
 	f2014 f2015 f2016, fe vce(cluster id)', data.in = dt)
 
+# 共同趋势检验
+stata('xtset id year
+xtreg logy c.d2014#c.f2012 c.d2014#c.f2013 c.d2014#c.f2014 c.d2014#c.f2015 c.d2014#c.f2016 ///
+	 c.d2015#c.f2012 c.d2015#c.f2013 c.d2015#c.f2014 c.d2015#c.f2015 c.d2015#c.f2016 ///
+	 c.d2016#c.f2012 c.d2016#c.f2013 c.d2016#c.f2014 c.d2016#c.f2015 c.d2016#c.f2016 ///
+	f2012 f2013 f2014 f2015 f2016, fe vce(cluster id)', data.in = dt)
+
 # 双因素回归
 fit <- didWD(stg6, id = 'id', year = 'year', y = 'logy', w = 'w')
-coeftest(fit, vcov. = vcovHC, method = 'white2')
+coeftest(fit$fit, vcov. = vcovHC, method = 'white2')
 
+fit <- cttest(stg6, id = 'id', year = 'year', y = 'logy', w = 'w')
+
+fit[['fit']] %>% coeftest(vcov. = vcovHC, method = 'white2')
+
+names(coef(fit$fit))
 
 
 # ----------add X--------------

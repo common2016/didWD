@@ -12,8 +12,8 @@
 #'
 #' @import magrittr
 #'
-#' @return A list including 2 elements, one is results of regression with Two ways fixed effect,
-#' another is data frame added \eqn{d_q} and \eqn{f_t}.
+#' @return A list including 3 elements, the first is results of regression with Two ways fixed effect,
+#' the second is the data frame \eqn{f_t}, and the third is the data frame \eqn{d_q}.
 #'
 #' @export
 #' @examples
@@ -29,11 +29,12 @@ didWD <- function(dt, id, year, y, w, wcontinuous = NULL){
   stgyr <- dt$year[dt$w!=0] %>% unique() %>% sort()
 
   # generate fq
-  dt <- gen_fst(dt, year, stgyr)
+  ft <- gen_fst(dt, year, stgyr)
 
   # generate dq
-  dt <- gen_dq(dt, id, w, stgyr)
+  dq <- gen_dq(dt, id, w, stgyr)
 
+  dt <- cbind(dt, ft, dq)
   # generate formula
   allyr <- unique(dt[,year])
   calendar <- allyr[allyr >= min(stgyr)]
@@ -51,5 +52,5 @@ didWD <- function(dt, id, year, y, w, wcontinuous = NULL){
 
   # TWFE
   fit <- plm::plm(fml, index = c(id, year), effect = 'twoways',model = 'within', data = dt)
-  return(list(fit = fit, data = dt))
+  return(list(fit = fit, ft = ft, dq = dq))
 }

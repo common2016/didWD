@@ -17,7 +17,7 @@ and \eqn{T-i=1} indicates in the treated periods.}
 \item{stgyr}{A numerica vector about staggered years.}
 }
 \value{
-A data.frame includes \eqn{d_q} dummy variables.
+A data.frame including \eqn{d_q} dummy variables.
 }
 \description{
 Generate \eqn{d_q}

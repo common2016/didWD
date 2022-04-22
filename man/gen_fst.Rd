@@ -15,7 +15,7 @@ gen_fst(dt, tm, stgyr = 2014:2016)
 the function would generate \code{f2014,f2015,f2016} three dummy variables.}
 }
 \value{
-A data.frame includes time dummy variables.
+A data.frame including time dummy variables.
 }
 \description{
 Generate \eqn{fs_t}

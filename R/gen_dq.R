@@ -7,7 +7,7 @@
 #' and \eqn{T-i=1} indicates in the treated periods.
 #' @param stgyr A numerica vector about staggered years.
 #'
-#' @return A data.frame includes \eqn{d_q} dummy variables.
+#' @return A data.frame including \eqn{d_q} dummy variables.
 #' @export
 #' @importFrom rlang .data
 #'
@@ -22,6 +22,6 @@ gen_dq <- function(dt, id, w, stgyr){
   # rename
   # entry_yr <- stgyr - min(dt$year) + 1
   names(ans) <- paste('d', as.character(stgyr), sep = '')
-  dt <- cbind(dt, ans)
-  return(dt)
+  # dt <- cbind(dt, ans)
+  return(ans)
 }
