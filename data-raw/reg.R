@@ -28,8 +28,10 @@ xtreg logy c.d2014#c.f2012 c.d2014#c.f2013 c.d2014#c.f2014 c.d2014#c.f2015 c.d20
 fit <- didWD(stg6, id = 'id', year = 'year', y = 'logy', w = 'w')
 coeftest(fit$fit, vcov. = vcovHC, method = 'white2')
 
-fit <- cttest(stg6, id = 'id', year = 'year', y = 'logy', w = 'w')
 
+fit <- didWD(stg6, id = 'id', year = 'year', y = 'logy', w = 'w', pretime = T)
+cttest(fit)
+dyneff(fit)
 fit[['fit']] %>% coeftest(vcov. = vcovHC, method = 'white2')
 
 names(coef(fit$fit))

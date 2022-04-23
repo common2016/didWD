@@ -4,7 +4,7 @@
 \alias{didWD}
 \title{DID Regression}
 \usage{
-didWD(dt, id, year, y, w, wcontinuous = NULL)
+didWD(dt, id, year, y, w, wcontinuous = NULL, pretime = FALSE)
 }
 \arguments{
 \item{dt}{A data.frame including \code{id}, \code{year}, \code{y} and \code{w}.}
@@ -19,10 +19,12 @@ didWD(dt, id, year, y, w, wcontinuous = NULL)
 and \eqn{T-i=1} indicates in the treated periods.}
 
 \item{wcontinuous}{A character, the continuous treatment variable's name. Default is \code{NULL}.}
+
+\item{pretime}{Wheather add \eqn{dq\cdot ft, t < q} as independent variables. Default is \code{FALSE}.}
 }
 \value{
 A list including 3 elements, the first is results of regression with Two ways fixed effect,
-the second is the data frame \eqn{f_t}, and the third is the data frame \eqn{d_q}.
+the second is the data frame \eqn{ft}, and the third is the data frame \eqn{dq}.
 }
 \description{
 Make a DID regression conditional on staggered treatment based on Wooldridge (2021).

@@ -2,36 +2,23 @@
 % Please edit documentation in R/cttest.R
 \name{cttest}
 \alias{cttest}
-\title{DID Regression}
+\title{Common Trend Test}
 \usage{
-cttest(dt, id, year, y, w, wcontinuous = NULL)
+cttest(didfit)
 }
 \arguments{
-\item{dt}{A data.frame including \code{id}, \code{year}, \code{y} and \code{w}.}
-
-\item{id}{A coloumn name denotes individuals.}
-
-\item{year}{A coloumn name denotes times. \code{dt$year} is numeric.}
-
-\item{y}{A coloumn name denotes the dependent variable.}
-
-\item{w}{A dummy variable which equals \eqn{D_i\cdot T_i} where \eqn{D_i=1} indicates treated group,
-and \eqn{T-i=1} indicates in the treated periods.}
-
-\item{wcontinuous}{A character, the continuous treatment variable's name. Default is \code{NULL}.}
+\item{didfit}{the object returned by \code{didWD} whose parameters \code{pretime} is \code{TRUE}.}
 }
 \value{
-A list including 4 elements, the first is results of regression with Two ways fixed effect,
-the second is the data frame \eqn{f_t}, the third is the data frame \eqn{d_q},
-and the fourth is the F statistics testing HO: there is a common trend.
+F statistics testing HO: there is a common trend.
 }
 \description{
-Make a DID regression conditional on staggered treatment based on Wooldridge (2021).
+Common Trend Test
 }
 \examples{
 library(plm)
 data(stg6, package = 'didWD')
-fit <- cttest(stg6, id = 'id', year = 'year', y = 'logy', w = 'w')
-fit$Fstats
+fit <- didWD(stg6, id = 'id', year = 'year', y = 'logy', w = 'w', pretime = TRUE)
+cttest(fit)
 
 }

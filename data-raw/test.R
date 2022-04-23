@@ -11,8 +11,10 @@ regdata$w[regdata$operationalstock > 100] <- 1
 cn <- regdata[regdata$iso2c %in% c('CN') & regdata$year <= 2014,]
 
 cn$wcont <- log(cn$operationalstock+1)
-fit <- didWD(cn, 'id', 'year', y = 'TFP', w = 'w', wcontinuous = 'wcont')
+fit <- didWD(cn, 'id', 'year', y = 'TFP', w = 'w', wcontinuous = 'wcont', pretime = T)
+fit <- didWD(cn, 'id', 'year', y = 'TFP', w = 'w', pretime = T)
 summary(fit$fit)
+ans <- dyneff(fit, se = 'arellano', type = 'sss')
 
 xname <- coef(fit$fit) %>% names()
 aggeff(fit$fit, xname)
